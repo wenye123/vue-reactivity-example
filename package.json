@@ -1,0 +1,51 @@
+{
+  "name": "learn-vue",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    ""
+  ],
+  "author": "wenye <1583247975@qq.com>",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "format": "prettier --write \"./{src,benchmark,test}/**/*.{js,ts,json,yaml}\"",
+    "compile": "rm -rf dist && tsc",
+    "prepublish": "npm run compile",
+    "test": "npm run format && mocha test/test-*.ts",
+    "test:cov": "nyc mocha test/test-*.ts"
+  },
+  "nyc": {
+    "all": true,
+    "extension": [
+      ".ts"
+    ],
+    "include": [
+      "src"
+    ],
+    "reporter": [
+      "text",
+      "text-summary",
+      "lcov"
+    ],
+    "exclude": [
+      "**/*.d.ts"
+    ]
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.9",
+    "@types/mocha": "^7.0.1",
+    "@types/node": "^13.7.1",
+    "chai": "^4.2.0",
+    "coveralls": "^3.0.9",
+    "mocha": "^7.0.1",
+    "nyc": "^15.0.0",
+    "prettier": "^1.19.1",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
+  }
+}
