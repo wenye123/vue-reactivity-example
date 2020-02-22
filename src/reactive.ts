@@ -22,6 +22,16 @@ function parsePath(path: string) {
   };
 }
 
+/** 是否对象 */
+function isObject(val: any) {
+  return val !== null && typeof val === "object";
+}
+
+/** 是否拥有该属性 */
+function hasOwn(obj: any, key: string) {
+  return Object.prototype.hasOwnProperty.call(obj, key);
+}
+
 /** 定义属性 */
 function def(obj: any, key: string, val: any, enumerable: boolean = false) {
   Object.defineProperty(obj, key, {
@@ -128,9 +138,9 @@ class Observer {
 
 /** 为value创建一个Observer实例，如果已有则直接返回 */
 function observe(value: any) {
-  if (value === null || typeof value !== "object") return;
+  if (!isObject(value)) return;
   let ob: Observer;
-  if (Object.prototype.hasOwnProperty.call(value, "__ob__") && value.__ob__ instanceof Observer) {
+  if (hasOwn(value, "__ob__") && value.__ob__ instanceof Observer) {
     ob = value.__ob__;
   } else {
     ob = new Observer(value);
