@@ -37,3 +37,15 @@ export function def(obj: any, key: string, val: any, enumerable: boolean = false
 
 /** 是否存在__proto__属性 */
 export const hasProto = "__proto__" in {};
+
+/** 代理属性 */
+export function proxy(target: any, sourceKey: string, key: string) {
+  Object.defineProperty(target, key, {
+    get() {
+      return this[sourceKey][key];
+    },
+    set(val: any) {
+      this[sourceKey][key] = val;
+    },
+  });
+}

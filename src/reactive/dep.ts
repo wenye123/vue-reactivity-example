@@ -1,23 +1,36 @@
 import { Watcher } from "./watcher";
 import { Window } from "./utils";
 
+let uid = 0;
+
 /** 依赖收集类 */
 export class Dep {
-  private subs: Set<Watcher>;
+  private subs: Array<Watcher>;
+  id: number;
+
   constructor() {
-    this.subs = new Set();
+    this.subs = [];
+    this.id = uid++;
   }
-  private addSub(sub: Watcher) {
-    this.subs.add(sub);
+
+  addSub(sub: Watcher) {
+    this.subs.push(sub);
   }
-  // private removeSub(sub: Watcher) {
-  //   this.subs.delete(sub);
-  // }
-  depend() {
-    if (Window.target) {
-      this.addSub(Window.target);
+
+  removeSub(sub: Watcher) {
+    const index = this.subs.indexOf(sub);
+    if (index > -1) {
+      return this.subs.splice(index, 1);
     }
   }
+
+  depend() {
+    if (Window.target) {
+      // this.addSub(Window.target); // 废弃
+      (Window.target as Watcher).addDep(this);
+    }
+  }
+
   notify() {
     this.subs.forEach(sub => {
       sub.update();

@@ -33,11 +33,11 @@ const arrayKeys = Object.getOwnPropertyNames(arrayMethods);
 });
 
 export class Observer {
-  // private value: any;
+  value: any;
   /** 存储数组的依赖 */
   dep: Dep;
   constructor(value: any) {
-    // this.value = value;
+    this.value = value;
     this.dep = new Dep();
     def(value, "__ob__", this);
     if (Array.isArray(value)) {
@@ -56,6 +56,7 @@ export class Observer {
       this.walk(value);
     }
   }
+
   /** 将对象每一个属性都响应化 */
   private walk(obj: Record<string, any>) {
     const keys = Object.keys(obj);
@@ -63,6 +64,7 @@ export class Observer {
       defineReactive(obj, keys[i], obj[keys[i]]);
     }
   }
+
   /** 监听数组的每一项 */
   observeArray(arr: any[]) {
     for (let i = 0; i < arr.length; i++) {
