@@ -45,6 +45,22 @@ describe("测试响应式", function() {
     wue.info.arr[1].name = "yiye";
   });
 
+  it("watch fn", function() {
+    let obj: any;
+    wue.$watch(
+      function(this: Wue & Record<string, any>) {
+        return this.name + this.info.name;
+      },
+      (n, o) => {
+        assert.deepEqual({ n, o }, obj);
+      },
+    );
+    obj = { n: "yiyewenye", o: "wenyewenye" };
+    wue.name = "yiye";
+    obj = { n: "yiyeyiye", o: "yiyewenye" };
+    wue.info.name = "yiye";
+  });
+
   it("watch立即执行", function() {
     wue.$watch(
       "name",
