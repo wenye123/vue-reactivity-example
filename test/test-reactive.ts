@@ -1,18 +1,18 @@
-import { Wue } from "../src/reactive/index";
+import { Wue } from "../src/index";
 import { assert } from "chai";
 
 describe("测试响应式", function() {
   let wue: Wue & Record<string, any>;
   beforeEach(function() {
-    wue = new Wue({ name: "wenye", info: { name: "wenye", arr: [1, { name: "wenye" }] } });
+    wue = new Wue({ openid: "12345", info: { name: "wenye", hobby: ["唱歌", { tag: "跳舞", weight: 3 }] } });
   });
 
   it("单层对象", function() {
-    wue.$watch("name", (n, o) => {
-      assert.strictEqual(n, "yiye");
-      assert.strictEqual(o, "wenye");
+    wue.$watch("openid", (n, o) => {
+      assert.strictEqual(n, "54321");
+      assert.strictEqual(o, "12345");
     });
-    wue.name = "yiye";
+    wue.name = "54321";
   });
 
   it("多层对象", function() {
@@ -23,49 +23,49 @@ describe("测试响应式", function() {
     wue.info.name = "yiye";
   });
 
-  it("数组方法&数组新增元素", function() {
-    // 数组方法
-    wue.$watch("info.arr", (n, o) => {
-      assert.strictEqual(n.length, 3);
-    });
-    wue.info.arr.push({ name: "wenye" });
-    // 数组新增元素
-    wue.$watch("info.arr.2.name", (n, o) => {
+  it("数组内元素", function() {
+    wue.$watch("info.hobby.1.name", (n, o) => {
       assert.strictEqual(n, "yiye");
       assert.strictEqual(o, "wenye");
     });
-    wue.info.arr[2].name = "yiye";
+    wue.info.hobby[1].name = "yiye";
   });
 
-  it("数组内元素", function() {
-    wue.$watch("info.arr.1.name", (n, o) => {
-      assert.strictEqual(n, "yiye");
-      assert.strictEqual(o, "wenye");
+  it("数组方法&数组新增元素", function() {
+    // 数组方法
+    wue.$watch("info.hobby", (n, o) => {
+      assert.strictEqual(n.length, 3);
     });
-    wue.info.arr[1].name = "yiye";
+    wue.info.hobby.push({ tag: "篮球" });
+    // 数组新增元素
+    wue.$watch("info.hobby.2.tag", (n, o) => {
+      assert.strictEqual(n, "rap");
+      assert.strictEqual(o, "篮球");
+    });
+    wue.info.hobby[2].name = "rap";
   });
 
   it("watch fn", function() {
     let obj: any;
     wue.$watch(
       function(this: Wue & Record<string, any>) {
-        return this.name + this.info.name;
+        return this.openid + ":" + this.info.name;
       },
       (n, o) => {
         assert.deepEqual({ n, o }, obj);
       },
     );
-    obj = { n: "yiyewenye", o: "wenyewenye" };
-    wue.name = "yiye";
-    obj = { n: "yiyeyiye", o: "yiyewenye" };
+    obj = { n: "54321:wenye", o: "12345:wenye" };
+    wue.openid = "54321";
+    obj = { n: "54321:yiye", o: "54321:wenye" };
     wue.info.name = "yiye";
   });
 
   it("watch立即执行", function() {
     wue.$watch(
-      "name",
+      "openid",
       n => {
-        assert.strictEqual(n, "wenye");
+        assert.strictEqual(n, "12345");
       },
       {
         immediate: true,
@@ -85,10 +85,48 @@ describe("测试响应式", function() {
   });
 
   it("unwatch", function() {
-    const unWatcher = wue.$watch("name", (n, o) => {
+    const unWatcher = wue.$watch("openid", (n, o) => {
       throw new Error("不该执行");
     });
     unWatcher();
-    wue.name = "yiye";
+    wue.openid = "54321";
+  });
+
+  it("$set新增对象属性", function() {
+    wue.$watch("info", n => {
+      assert.strictEqual(n.age, 22);
+    });
+    wue.$set(wue.info, "age", 22);
+    // 新属性响应监听
+    wue.$watch("info.age", (n, o) => {
+      assert.deepEqual({ n, o }, { n: 23, o: 22 });
+    });
+    wue.info.age = 23;
+  });
+
+  it("$set新增数组属性", function() {
+    wue.$watch("info.hobby", n => {
+      assert.strictEqual(n.length, 3);
+    });
+    wue.$set(wue.info.hobby, 2, { tag: "rap" });
+    // 新属性响应监听
+    wue.$watch("info.hobby.2.tag", (n, o) => {
+      assert.deepEqual({ n, o }, { n: "跳舞", o: "rap" });
+    });
+    wue.info.hobby[2].tag = "跳舞";
+  });
+
+  it("$del删除属性", function() {
+    wue.$watch("info", n => {
+      assert.notExists(n.name, undefined);
+    });
+    wue.$del(wue.info, "name");
+  });
+
+  it("$del删除数组", function() {
+    wue.$watch("info.hobby", n => {
+      assert.strictEqual(n.length, 1);
+    });
+    wue.$del(wue.info.hobby, 0);
   });
 });

@@ -49,3 +49,9 @@ export function proxy(target: any, sourceKey: string, key: string) {
     },
   });
 }
+
+/** 是否有效的数组索引 */
+export function isValidArrayIndex(key: string | number) {
+  const n = parseFloat(String(key));
+  return n >= 0 && Math.floor(n) === n && isFinite(key as number);
+}

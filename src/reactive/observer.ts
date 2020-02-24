@@ -86,7 +86,7 @@ function observe(value: any) {
 }
 
 /** 对象定义响应式 */
-function defineReactive(data: any, key: string, val: any) {
+export function defineReactive(data: any, key: string, val: any) {
   const childOb = observe(val);
   const dep = new Dep();
   Object.defineProperty(data, key, {
