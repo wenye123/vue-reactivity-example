@@ -93,7 +93,7 @@ describe("测试响应式", function() {
   });
 
   it("$set新增对象属性", function() {
-    wue.$watch("info", n => {
+    wue.$watch("info", (n, o) => {
       assert.strictEqual(n.age, 22);
     });
     wue.$set(wue.info, "age", 22);

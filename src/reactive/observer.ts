@@ -32,10 +32,12 @@ const arrayKeys = Object.getOwnPropertyNames(arrayMethods);
   });
 });
 
+/** 响应观察对象生成类 */
 export class Observer {
   value: any;
   /** 存储数组的依赖 */
   dep: Dep;
+
   constructor(value: any) {
     this.value = value;
     this.dep = new Dep();

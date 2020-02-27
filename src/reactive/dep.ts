@@ -3,24 +3,24 @@ import { Window } from "./utils";
 
 let uid = 0;
 
-/** 依赖收集类 */
+/** 依赖管理类 */
 export class Dep {
-  private subs: Array<Watcher>;
+  private watchers: Array<Watcher>;
   id: number;
 
   constructor() {
-    this.subs = [];
+    this.watchers = [];
     this.id = uid++;
   }
 
-  addSub(sub: Watcher) {
-    this.subs.push(sub);
+  addSub(watch: Watcher) {
+    this.watchers.push(watch);
   }
 
-  removeSub(sub: Watcher) {
-    const index = this.subs.indexOf(sub);
+  removeSub(watch: Watcher) {
+    const index = this.watchers.indexOf(watch);
     if (index > -1) {
-      return this.subs.splice(index, 1);
+      return this.watchers.splice(index, 1);
     }
   }
 
@@ -32,8 +32,8 @@ export class Dep {
   }
 
   notify() {
-    this.subs.forEach(sub => {
-      sub.update();
+    this.watchers.forEach(watch => {
+      watch.update();
     });
   }
 }

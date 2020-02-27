@@ -3,8 +3,8 @@ import { IWatchCallback, IWatchExpOrFn, IWatchOptions } from "./types";
 import { Dep } from "./dep";
 import { isObject } from "util";
 
+/** 遍历值deep watch */
 const seenObj: Set<number> = new Set();
-
 function traverse(val: any) {
   _traverse(val, seenObj);
   seenObj.clear();
