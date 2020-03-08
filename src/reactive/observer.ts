@@ -1,4 +1,4 @@
-import { def, hasProto, hasOwn } from "./utils";
+import { def, hasProto, hasOwn, isValidArrayIndex } from "./utils";
 import { isObject } from "util";
 import { Dep } from "./dep";
 
@@ -88,7 +88,7 @@ function observe(value: any) {
 }
 
 /** 对象定义响应式 */
-export function defineReactive(data: any, key: string, val: any) {
+function defineReactive(data: any, key: string, val: any) {
   const childOb = observe(val);
   const dep = new Dep();
   Object.defineProperty(data, key, {
@@ -107,4 +107,53 @@ export function defineReactive(data: any, key: string, val: any) {
       dep.notify();
     },
   });
+}
+
+/** 新增响应属性 */
+export function set(target: any, key: any, value: any) {
+  // 数组
+  if (Array.isArray(target) && isValidArrayIndex(key)) {
+    target.length = Math.max(target.length, key);
+    target.splice(key, 1, value);
+    return value;
+  }
+  // key已经存在
+  if (hasOwn(target, key)) {
+    target[key] = value;
+    return value;
+  }
+  // 处理新增属性
+  const ob = target.__ob__;
+  if (target._isVue || (ob && ob.vmCount)) {
+    process.env.NODE_ENV !== "production" && console.warn("target不能是vue实例或者vue实例的根数据对象");
+    return value;
+  }
+  if (!ob) {
+    target[key] = value;
+    return value;
+  }
+  defineReactive(ob.value, key, value);
+  ob.dep.notify();
+  return value;
+}
+
+/** 删除响应属性 */
+export function del(target: any, key: any) {
+  // 数组
+  if (Array.isArray(target) && isValidArrayIndex(key)) {
+    target.splice(key, 1);
+    return;
+  }
+  // 删除属性
+  const ob = target.__ob__;
+  if (target._isVue || (ob && ob.vmCount)) {
+    process.env.NODE_ENV !== "production" && console.warn("删除属性不能在vue实例或者vue实例的根数据对象上");
+    return;
+  }
+  // 不是自身属性
+  if (!hasOwn(target, key)) return;
+  delete target[key];
+  // ob不存在则不通知
+  if (!ob) return;
+  ob.dep.notify();
 }
