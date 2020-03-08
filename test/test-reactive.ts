@@ -3,8 +3,27 @@ import { assert } from "chai";
 
 describe("测试响应式", function() {
   let wue: Wue & Record<string, any>;
+  let openidNameCount1 = 0,
+    openidNameCount2 = 0;
   beforeEach(function() {
-    wue = new Wue({ openid: "12345", info: { name: "wenye", hobby: ["唱歌", { tag: "跳舞", weight: 3 }] } });
+    wue = new Wue({
+      data: { openid: "12345", info: { name: "wenye", hobby: ["唱歌", { tag: "跳舞", weight: 3 }] } },
+      computed: {
+        openidName1() {
+          openidNameCount1++;
+          return `${this.openid}:${this.info.name}:1`;
+        },
+        openidName2: {
+          get(this: any): string {
+            openidNameCount2++;
+            return `${this.openid}:${this.info.name}:2`;
+          },
+          set(this: any, openid: string) {
+            this.openid = openid;
+          },
+        },
+      },
+    });
   });
 
   it("单层对象", function() {
@@ -128,5 +147,38 @@ describe("测试响应式", function() {
       assert.strictEqual(n.length, 1);
     });
     wue.$del(wue.info.hobby, 0);
+  });
+
+  it("computed function", function(done) {
+    // 模拟重新渲染watcher
+    wue.$watch("openidName1", () => {
+      assert.strictEqual(wue.openidName1, "54321:wenye:1");
+      done();
+    });
+    assert.strictEqual(wue.openidName1, "12345:wenye:1");
+    assert.strictEqual(openidNameCount1, 1);
+    // 再次读取不重复计算
+    assert.strictEqual(openidNameCount1, 1);
+    // 修改计算属性的依赖
+    wue.openid = "54321";
+  });
+
+  it("computed get", function(done) {
+    // 模拟重新渲染watcher
+    wue.$watch("openidName2", () => {
+      assert.strictEqual(wue.openidName2, "54321:wenye:2");
+      done();
+    });
+    assert.strictEqual(wue.openidName2, "12345:wenye:2");
+    assert.strictEqual(openidNameCount2, 1);
+    // 再次读取不重复计算
+    assert.strictEqual(openidNameCount2, 1);
+    // 修改计算属性的依赖
+    wue.openid = "54321";
+  });
+
+  it("computed set", function() {
+    wue.openidName2 = "54321";
+    assert.strictEqual(wue.openid, "54321");
   });
 });

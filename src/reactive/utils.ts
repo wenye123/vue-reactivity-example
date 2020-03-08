@@ -52,3 +52,6 @@ export function isValidArrayIndex(key: string | number) {
   const n = parseFloat(String(key));
   return n >= 0 && Math.floor(n) === n && isFinite(key as number);
 }
+
+/** 空函数 */
+export function noop(a?: any, b?: any, c?: any) {}

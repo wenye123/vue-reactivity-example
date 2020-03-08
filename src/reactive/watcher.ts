@@ -36,16 +36,20 @@ export class Watcher {
   private getter: any;
   private cb: IWatchCallback;
   private deep: boolean;
+  private lazy: boolean;
+  dirty: boolean;
   value: any;
 
   constructor(
     vm: any,
     expOrFn: IWatchExpOrFn,
     cb: IWatchCallback,
-    options: IWatchOptions = { immediate: false, deep: false },
+    options: IWatchOptions = { immediate: false, deep: false, lazy: false },
   ) {
     this.vm = vm;
     this.deep = !!options.deep;
+    this.lazy = !!options.lazy;
+    this.dirty = this.lazy;
     this.deps = [];
     this.depIds = new Set();
     if (typeof expOrFn === "function") {
@@ -54,7 +58,7 @@ export class Watcher {
       this.getter = parsePath(expOrFn); // 执行this.getter()就能得到诸如data.a.b的值
     }
     this.cb = cb;
-    this.value = this.get();
+    this.value = this.lazy ? undefined : this.get();
   }
 
   private get() {
@@ -65,6 +69,18 @@ export class Watcher {
     }
     popTarget();
     return value;
+  }
+
+  evaluate() {
+    this.value = this.get();
+    this.dirty = false;
+  }
+
+  depend() {
+    let i = this.deps.length;
+    while (i--) {
+      this.deps[i].depend();
+    }
   }
 
   addDep(dep: Dep) {
@@ -80,6 +96,7 @@ export class Watcher {
     const oldValue = this.value;
     this.value = this.get();
     this.cb.call(this.vm, this.value, oldValue);
+    if (this.lazy) this.dirty = true; // 新增computed而添加
   }
 
   teardown() {

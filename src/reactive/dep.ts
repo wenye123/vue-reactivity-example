@@ -45,7 +45,7 @@ export class Dep {
 const targetStack: Watcher[] = [];
 
 export function pushTarget(watcher: Watcher) {
-  if (Dep.target) targetStack.push(watcher);
+  if (Dep.target) targetStack.push(Dep.target);
   Dep.target = watcher;
 }
 
