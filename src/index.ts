@@ -8,14 +8,16 @@
 
 import { Observer, defineReactive } from "./reactive/observer";
 import { Watcher } from "./reactive/watcher";
-import { IWatchCallback, IWatchOptions, IWatchExpOrFn, IComputed, IComputedItem } from "./reactive/types";
 import { proxy, isValidArrayIndex, hasOwn, noop } from "./reactive/utils";
 import { Dep } from "./reactive/dep";
+import { IWatchCallback, IWatchOptions, IWatchExpOrFn } from "./reactive/watcher";
 
 export interface IWueOption {
   data: any;
   computed?: any;
 }
+export type IComputedItem = (() => any) | { get: () => any; set: (...args: any) => any };
+export type IComputed = Record<string, IComputedItem>;
 
 /** 这里的data对象并没有挂载到Wue实例中 */
 export class Wue {

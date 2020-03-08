@@ -1,7 +1,16 @@
 import { parsePath } from "./utils";
-import { IWatchCallback, IWatchExpOrFn, IWatchOptions } from "./types";
 import { Dep, pushTarget, popTarget } from "./dep";
 import { isObject } from "util";
+
+export interface IWatchOptions {
+  immediate?: boolean;
+  deep?: boolean;
+  lazy?: boolean;
+}
+
+export type IWatchCallback = (n: any, o?: any) => any;
+
+export type IWatchExpOrFn = string | (() => any);
 
 /** 遍历值deep watch */
 const seenObj: Set<number> = new Set();
