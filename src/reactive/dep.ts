@@ -1,10 +1,10 @@
 import { Watcher } from "./watcher";
-import { Window } from "./utils";
 
 let uid = 0;
 
 /** 依赖管理类 */
 export class Dep {
+  static target: Watcher | undefined;
   private watchers: Array<Watcher>;
   id: number;
 
@@ -13,27 +13,42 @@ export class Dep {
     this.id = uid++;
   }
 
-  addSub(watch: Watcher) {
+  /** 添加依赖 */
+  addWatch(watch: Watcher) {
     this.watchers.push(watch);
   }
 
-  removeSub(watch: Watcher) {
+  /** 移除依赖 */
+  removeWatch(watch: Watcher) {
     const index = this.watchers.indexOf(watch);
     if (index > -1) {
       return this.watchers.splice(index, 1);
     }
   }
 
+  /** 收集依赖 */
   depend() {
-    if (Window.target) {
+    if (Dep.target) {
       // this.addSub(Window.target); // 废弃
-      (Window.target as Watcher).addDep(this);
+      Dep.target.addDep(this);
     }
   }
 
+  /** 触发依赖更新 */
   notify() {
     this.watchers.forEach(watch => {
       watch.update();
     });
   }
+}
+
+const targetStack: Watcher[] = [];
+
+export function pushTarget(watcher: Watcher) {
+  if (Dep.target) targetStack.push(watcher);
+  Dep.target = watcher;
+}
+
+export function popTarget() {
+  Dep.target = targetStack.pop();
 }

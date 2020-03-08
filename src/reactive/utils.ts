@@ -1,6 +1,3 @@
-/** 使用global来模拟window */
-export const Window: any = global;
-
 /** 解析对象访问字符串 */
 const bailRe = /[^\w.$]/;
 export function parsePath(path: string) {

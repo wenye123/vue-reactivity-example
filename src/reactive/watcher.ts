@@ -1,6 +1,6 @@
-import { parsePath, Window } from "./utils";
+import { parsePath } from "./utils";
 import { IWatchCallback, IWatchExpOrFn, IWatchOptions } from "./types";
-import { Dep } from "./dep";
+import { Dep, pushTarget, popTarget } from "./dep";
 import { isObject } from "util";
 
 /** 遍历值deep watch */
@@ -58,12 +58,12 @@ export class Watcher {
   }
 
   private get() {
-    Window.target = this;
+    pushTarget(this);
     const value = this.getter.call(this.vm, this.vm);
     if (this.deep) {
       traverse(value);
     }
-    Window.target = undefined;
+    popTarget();
     return value;
   }
 
@@ -72,7 +72,7 @@ export class Watcher {
     if (!this.depIds.has(id)) {
       this.depIds.add(id);
       this.deps.push(dep);
-      dep.addSub(this);
+      dep.addWatch(this);
     }
   }
 
@@ -85,7 +85,7 @@ export class Watcher {
   teardown() {
     let i = this.deps.length;
     while (i--) {
-      this.deps[i].removeSub(this);
+      this.deps[i].removeWatch(this);
     }
   }
 }

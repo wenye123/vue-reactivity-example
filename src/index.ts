@@ -2,7 +2,7 @@
  * 对象: 在getter中收集依赖 在setter中触发依赖
  * 数组: 在getter中收集依赖 在拦截器中触发依赖
  *
- * bug: $set 字属性的监听也会触发
+ * bug: $set 子属性的监听也会触发 https://github.com/berwin/easy-to-understand-Vue.js-examples/issues/5
  */
 
 import { Observer, defineReactive } from "./reactive/observer";
