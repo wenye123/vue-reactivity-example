@@ -102,10 +102,16 @@ export class Watcher {
   }
 
   update() {
-    const oldValue = this.value;
-    this.value = this.get();
-    this.cb.call(this.vm, this.value, oldValue);
-    if (this.lazy) this.dirty = true; // 新增computed而添加
+    if (this.lazy) {
+      this.dirty = true;
+    } else {
+      const value = this.get();
+      if (value !== this.value || isObject(value) || this.deep) {
+        const oldValue = this.value;
+        this.value = value;
+        this.cb.call(this.vm, this.value, oldValue);
+      }
+    }
   }
 
   teardown() {

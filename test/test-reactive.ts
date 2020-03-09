@@ -1,7 +1,7 @@
 import { Wue } from "../src/index";
 import { assert } from "chai";
 
-describe("测试响应式", function() {
+describe("响应式", function() {
   let wue: Wue & Record<string, any>;
   let openidNameCount1 = 0,
     openidNameCount2 = 0;
@@ -153,6 +153,7 @@ describe("测试响应式", function() {
     // 模拟重新渲染watcher
     wue.$watch("openidName1", () => {
       assert.strictEqual(wue.openidName1, "54321:wenye:1");
+      assert.strictEqual(openidNameCount1, 2);
       done();
     });
     assert.strictEqual(wue.openidName1, "12345:wenye:1");
@@ -167,6 +168,8 @@ describe("测试响应式", function() {
     // 模拟重新渲染watcher
     wue.$watch("openidName2", () => {
       assert.strictEqual(wue.openidName2, "54321:wenye:2");
+      assert.strictEqual(openidNameCount2, 2);
+
       done();
     });
     assert.strictEqual(wue.openidName2, "12345:wenye:2");

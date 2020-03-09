@@ -1,9 +1,6 @@
 /**
  * 对象: 在getter中收集依赖 在setter中触发依赖
  * 数组: 在getter中收集依赖 在拦截器中触发依赖
- *
- * bug: $set 子属性的监听也会触发 https://github.com/berwin/easy-to-understand-Vue.js-examples/issues/5
- * bug: 计算属性改变值执行多次计算属性的计算
  */
 
 import { Observer, set, del } from "./reactive/observer";
@@ -67,7 +64,9 @@ function initComputed(vm: Wue, computed: IComputed) {
     if (process.env.NODE_ENV !== "production" && !getter) {
       console.warn(`计算属性${key}缺少getter`, vm);
     }
+    // 创建计算属性的watcher
     watchers[key] = new Watcher(vm, getter || noop, noop, computedWatcherOptions);
+    // vm上不存在则定义
     if (!(key in vm)) {
       defineComputed(vm, key, userDef);
     } else {
