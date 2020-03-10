@@ -1,6 +1,7 @@
 ## vue响应式实现例子
 
 [![Build Status](https://travis-ci.org/wenye123/vue-reactivity-example.svg?branch=master)](https://travis-ci.org/wenye123/vue-reactivity-example)
+[![Coverage Status](https://coveralls.io/repos/github/wenye123/vue-reactivity-example/badge.svg?branch=master)](https://coveralls.io/github/wenye123/vue-reactivity-example?branch=master)
 
 测试用例如下
 
