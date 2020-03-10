@@ -1,9 +1,12 @@
 {
   "name": "vue-reactivity-example",
   "version": "1.0.0",
-  "description": "",
+  "description": "vue响应式实现例子",
   "keywords": [
-    ""
+    "vue",
+    "reactivity",
+    "reactive",
+    "example"
   ],
   "author": "wenye <1583247975@qq.com>",
   "license": "ISC",
