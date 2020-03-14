@@ -5,7 +5,7 @@ import { isObject } from "util";
 export interface IWatchOptions {
   immediate?: boolean;
   deep?: boolean;
-  lazy?: boolean;
+  computed?: boolean;
 }
 
 export type IWatchCallback = (n: any, o?: any) => any;
@@ -42,10 +42,11 @@ export class Watcher {
   private vm: any;
   private deps: Dep[];
   private depIds: Set<number>;
+  private dep?: Dep;
   private getter: any;
   private cb: IWatchCallback;
   private deep: boolean;
-  private lazy: boolean;
+  private computed: boolean;
   dirty: boolean;
   value: any;
 
@@ -53,12 +54,12 @@ export class Watcher {
     vm: any,
     expOrFn: IWatchExpOrFn,
     cb: IWatchCallback,
-    options: IWatchOptions = { immediate: false, deep: false, lazy: false },
+    options: IWatchOptions = { immediate: false, deep: false, computed: false },
   ) {
     this.vm = vm;
     this.deep = !!options.deep;
-    this.lazy = !!options.lazy;
-    this.dirty = this.lazy;
+    this.computed = !!options.computed;
+    this.dirty = this.computed;
     this.deps = [];
     this.depIds = new Set();
     if (typeof expOrFn === "function") {
@@ -67,7 +68,12 @@ export class Watcher {
       this.getter = parsePath(expOrFn); // 执行this.getter()就能得到诸如data.a.b的值
     }
     this.cb = cb;
-    this.value = this.lazy ? undefined : this.get();
+    if (this.computed) {
+      this.value = undefined;
+      this.dep = new Dep();
+    } else {
+      this.value = this.get();
+    }
   }
 
   private get() {
@@ -86,9 +92,8 @@ export class Watcher {
   }
 
   depend() {
-    let i = this.deps.length;
-    while (i--) {
-      this.deps[i].depend();
+    if (this.dep && Dep.target) {
+      this.dep.depend();
     }
   }
 
@@ -102,8 +107,16 @@ export class Watcher {
   }
 
   update() {
-    if (this.lazy) {
-      this.dirty = true;
+    if (this.computed) {
+      if (this.dep!.watchers.length === 0) {
+        // lazy模式
+        this.dirty = true;
+      } else {
+        // activated模式
+        this.getAndInvoke(() => {
+          this.dep!.notify();
+        });
+      }
     } else {
       const value = this.get();
       if (value !== this.value || isObject(value) || this.deep) {
@@ -111,6 +124,16 @@ export class Watcher {
         this.value = value;
         this.cb.call(this.vm, this.value, oldValue);
       }
+    }
+  }
+
+  getAndInvoke(cb: IWatchCallback) {
+    const value = this.get();
+    if (value !== this.value || isObject(value) || this.deep) {
+      const oldValue = this.value;
+      this.value = value;
+      this.dirty = false;
+      cb.call(this.vm, this.value, oldValue);
     }
   }
 

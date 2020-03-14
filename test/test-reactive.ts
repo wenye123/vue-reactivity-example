@@ -169,7 +169,6 @@ describe("响应式", function() {
     wue.$watch("openidName2", () => {
       assert.strictEqual(wue.openidName2, "54321:wenye:2");
       assert.strictEqual(openidNameCount2, 2);
-
       done();
     });
     assert.strictEqual(wue.openidName2, "12345:wenye:2");

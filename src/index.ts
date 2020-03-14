@@ -6,7 +6,6 @@
 import { Observer, set, del } from "./reactive/observer";
 import { Watcher } from "./reactive/watcher";
 import { proxy, noop } from "./reactive/utils";
-import { Dep } from "./reactive/dep";
 import { IWatchCallback, IWatchOptions, IWatchExpOrFn } from "./reactive/watcher";
 
 export interface IWueOption {
@@ -53,7 +52,7 @@ export class Wue {
   $del = del;
 }
 
-const computedWatcherOptions = { lazy: true };
+const computedWatcherOptions = { computed: true };
 
 /** 初始化计算属性 */
 function initComputed(vm: Wue, computed: IComputed) {
@@ -98,13 +97,8 @@ function createComputedGetter(key: string) {
   return function computedGetter(this: Wue) {
     const watcher = this._computedWatchers[key];
     if (watcher) {
-      if (watcher.dirty) {
-        watcher.evaluate();
-      }
-      if (Dep.target) {
-        watcher.depend();
-      }
-      return watcher.value;
+      watcher.depend();
+      return watcher.dirty ? watcher.evaluate() : watcher.value;
     }
   };
 }

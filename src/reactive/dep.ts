@@ -5,7 +5,7 @@ let uid = 0;
 /** 依赖管理类 */
 export class Dep {
   static target: Watcher | undefined;
-  private watchers: Array<Watcher>;
+  watchers: Array<Watcher>;
   id: number;
 
   constructor() {
