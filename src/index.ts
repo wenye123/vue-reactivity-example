@@ -13,7 +13,7 @@ export interface IWueOption {
   data: any;
   computed?: any;
 }
-export type IComputedItem = (() => any) | { get: () => any; set: (...args: any) => any };
+export type IComputedItem = (() => any) | { get?: () => any; set?: (...args: any) => any };
 export type IComputed = Record<string, IComputedItem>;
 
 /** 这里的data对象并没有挂载到Wue实例中 */
